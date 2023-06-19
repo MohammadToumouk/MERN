@@ -10,11 +10,11 @@ const CountrySchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    alpha2Code:{
+    alpha2:{
         type:String,
         required:true
     },
-    alpha3Code:{
+    alpha3:{
         type:String,
         required:true
     }

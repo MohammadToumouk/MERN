@@ -12,7 +12,7 @@ app.use(express.json())
 mongoose.connect(
     'mongodb+srv://mohamedtomoq:4Ucx2IyfGIFtBEwI@cluster0.hnugudw.mongodb.net/MERN-APP?retryWrites=true&w=majority'
 )
-
+/* Fetching the Data */
 app.get('/getUsers', (req,res ) =>{
     UserModel.find({}).then(function(users){
         res.json(users)
@@ -37,10 +37,10 @@ app.get('/getCountries', (req,res) =>{
     })
 
 })
-app.get('/getCountries/:alpha2Code', (req,res) =>{
-    const alpha2Code = req.params.alpha2Code;
+app.get('/getCountries/:alpha2', (req,res) =>{
+    const alpha2 = req.params.alpha2;
 
-    CountryModel.findOne({alpha2Code}).then(function(country){
+    CountryModel.findOne({alpha2}).then(function(country){
         if(!country){
             return res.status(405).send("cant find")
         }
@@ -52,6 +52,8 @@ app.get('/getCountries/:alpha2Code', (req,res) =>{
     });
 
 });
+
+/* Creating the Data */
 
 app.post("/createUser", async (req,res) => {
     const user = req.body;
@@ -74,10 +76,48 @@ app.post("/createCountry", async (req,res) => {
     res.json(country);
 })
 
+/* Updating the Data */
 
+app.put("/updateUser/:name", async (req,res) => {
+    const {name} = req.params;
+    const updatedUser = req.body;
 
+    try{
+        const user = await UserModel.findOneAndReplace({name}, updatedUser, {
+            new:true,
+        });
+        if(!user){
+            res.status(404).send("cant find any matching usernames")
+        }
+        res.json(user)
+    } catch(err){
+        console.log(err)
+        res.status(500)
+    }
 
+});
 
-app.listen(3005, () => {
+/* Deleting the Data */
+
+app.delete("/deleteUser/:name", async (req,res) => {
+    const {name} = req.params;
+    
+    try{
+        const deletedUser = await UserModel.findOneAndDelete({name});
+        if(!deletedUser){
+            res.status(404).send("fuck off nothing got deleted");
+        }
+        res.json({message: "User deleted successfully"});
+    } catch (err) {
+        console.log(err)
+        res.status(500)
+    }
+    
+});
+
+app.listen(3009, () => {
     console.log("server is running on fire")
 })
+
+
+
